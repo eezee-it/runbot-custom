@@ -20,3 +20,22 @@
             self.execute_simple(cr, uid, [wiz_id])
             modules.state_update(cr, uid, ids,
                 'to install', ['uninstalled'], context=context)
+-
+  I install the template
+-
+  !python {model: wizard.multi.charts.accounts}: |
+    account_chart_template = self.pool.get('account.chart.template')
+    wizards = self.pool.get('ir.actions.todo')
+    wiz = wizards.browse(cr, uid, ref('account.action_wizard_multi_chart_todo'))
+    chart_template_id = account_chart_template.search(cr, uid, [])
+    # if we know the country and the wizard has not yet been executed, we do it
+    if (chart_template_id) and (wiz.state=='open'):
+        ids = modules.search(cr, uid, [ ('name','=',mod) ], context=context)
+        if ids:
+            wizards.write(cr, uid, [ref('account.action_wizard_multi_chart_todo')], {
+                'state': 'done'
+            })
+            wiz_id = self.create(cr, uid, {
+                'chart_template_id': chart_template_id[0]
+            })
+            self.action_next(cr, uid, [wiz_id])
