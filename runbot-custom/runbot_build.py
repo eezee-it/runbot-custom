@@ -68,7 +68,7 @@ class RunbotBuild(osv.osv):
             build_cr.execute("SELECT id FROM ir_module_module WHERE state = 'installed' AND name = 'account'")
             if build_cr.fetchone():
                 print 'Start importing'
-                tools.convert_file(build_cr, 'runbot_account_post_install', 'account_post_install.yml', {})
+                tools.convert_file(build_cr, 'runbot-custom', 'account_post_install.yml', {})
                 build_cr.commit()
                 print 'End importing'
         except:
