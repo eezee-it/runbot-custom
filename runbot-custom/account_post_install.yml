@@ -27,15 +27,28 @@
     account_chart_template = self.pool.get('account.chart.template')
     wizards = self.pool.get('ir.actions.todo')
     wiz = wizards.browse(cr, uid, ref('account.action_wizard_multi_chart_todo'))
-    chart_template_id = account_chart_template.search(cr, uid, [])
+    chart_template_id = account_chart_template.search(cr, uid, [], order='id')
     # if we know the country and the wizard has not yet been executed, we do it
     if (chart_template_id) and (wiz.state=='open'):
+        wizards.write(cr, uid, [ref('account.action_wizard_multi_chart_todo')], {
+            'state': 'done'
+        })
+        values = self.default_get(cr, uid, ['sale_tax', 'purchase_tax'], context={})
+        values.update({'code_digits': 6, 'complete_tax_set': True, 'chart_template_id': chart_template_id[-1]})
+
+        wiz_id = self.create(cr, uid, values)
+        self.execute(cr, uid, [wiz_id], context={})
+
+-
+  Finish the installation
+-
+  !python {model: wizard.multi.charts.accounts}: |
+    modules = self.pool.get('ir.module.module')
+    part = self.pool.get('res.partner').browse(cr, uid, ref('base.main_partner'))
+    # if we know the country and the wizard has not yet been executed, we do it
+    if (part.country_id.id):
+        mod = 'l10n_'+part.country_id.code.lower()
         ids = modules.search(cr, uid, [ ('name','=',mod) ], context=context)
         if ids:
-            wizards.write(cr, uid, [ref('account.action_wizard_multi_chart_todo')], {
-                'state': 'done'
-            })
-            wiz_id = self.create(cr, uid, {
-                'chart_template_id': chart_template_id[0]
-            })
-            self.action_next(cr, uid, [wiz_id])
+          modules.button_install_cancel(cr, uid, ids)
+          modules.button_immediate_install(cr, uid, ids)

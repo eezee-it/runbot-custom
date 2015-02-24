@@ -18,7 +18,7 @@
 #
 ##############################################################################
 {
-    "name": "Runbot Account Post Install",
+    "name": "Runbot Custom",
     "version": "0.1",
     "author": "Eezee-It",
     "category": "Base",
@@ -26,11 +26,10 @@
     "description": "When using a profile loading the company country, if you install this module, "
                    "(Put after the profile installation)"
                    "it will install the country chart of account",
-    "depends": ["account"],
+    "depends": ["base","runbot"],
     "init_xml": [],
     "demo_xml": [],
     "data": [
-        "account_post_install.yml",
     ],
     "active": False,
     "installable": True
