@@ -30,6 +30,7 @@
     "init_xml": [],
     "demo_xml": [],
     "data": [
+        'res_config_view.xml'
     ],
     "active": False,
     "installable": True

@@ -36,6 +36,12 @@ def now():
 class RunbotBuild(osv.osv):
     _inherit = "runbot.build"
 
+    def job_10_test_base(self, cr, uid, build, lock_path, log_path):
+        disable_job = self.pool.get('ir.config_parameter').get_param(cr, uid, 'runbot.disable_job_10', default='True')
+        if disable_job == 'True':
+            return
+        super(RunbotBuild, self).job_10_test_base(cr, uid, build, lock_path, log_path)
+
     def job_15_install_all(self, cr, uid, build, lock_path, log_path):
         build._log('install_all', 'Start install all modules')
         self.pg_createdb(cr, uid, "%s-all" % build.dest)
