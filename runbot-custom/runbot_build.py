@@ -24,6 +24,11 @@ from openerp.osv import osv
 import os
 import time
 import openerp
+import logging
+from openerp import SUPERUSER_ID
+
+_logger = logging.getLogger(__name__)
+
 
 def grep(filename, string):
     if os.path.isfile(filename):
@@ -39,7 +44,10 @@ class RunbotBuild(osv.osv):
     def job_10_test_base(self, cr, uid, build, lock_path, log_path):
         disable_job = self.pool.get('ir.config_parameter').get_param(cr, uid, 'runbot.disable_job_10', default='True')
         if disable_job == 'True':
-            return
+            _logger.info('Job 10 disable')
+            build.checkout()
+            return self.spawn('', lock_path, log_path, cpu_limit=2100)
+        _logger.info('Job 10 enable')
         super(RunbotBuild, self).job_10_test_base(cr, uid, build, lock_path, log_path)
 
     def job_15_install_all(self, cr, uid, build, lock_path, log_path):
