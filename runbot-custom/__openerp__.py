@@ -30,7 +30,8 @@
     "init_xml": [],
     "demo_xml": [],
     "data": [
-        'res_config_view.xml'
+        'res_config_view.xml',
+        'runbot_repo.xml',
     ],
     "active": False,
     "installable": True

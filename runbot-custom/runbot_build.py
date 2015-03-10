@@ -26,6 +26,8 @@ import time
 import openerp
 import logging
 from openerp import SUPERUSER_ID
+from openerp.osv import fields, osv
+from openerp.addons.runbot.runbot import RunbotController
 
 _logger = logging.getLogger(__name__)
 
@@ -41,12 +43,18 @@ def now():
 class RunbotBuild(osv.osv):
     _inherit = "runbot.build"
 
+    _columns = {
+        'disable_base_log': fields.boolean('Disable Base Log'),
+    }
+
     def job_10_test_base(self, cr, uid, build, lock_path, log_path):
         disable_job = self.pool.get('ir.config_parameter').get_param(cr, uid, 'runbot.disable_job_10', default='True')
         if disable_job == 'True':
             _logger.info('Job 10 disable')
+            print build
+            self.write(cr, SUPERUSER_ID, build.id, {'disable_base_log': True})
             build.checkout()
-            return self.spawn('', lock_path, log_path, cpu_limit=2100)
+            return
         _logger.info('Job 10 enable')
         super(RunbotBuild, self).job_10_test_base(cr, uid, build, lock_path, log_path)
 
@@ -92,3 +100,12 @@ class RunbotBuild(osv.osv):
         build_cr.close()
         threading.current_thread().dbname = cr.dbname
         return
+
+class Controller(RunbotController):
+    def build_info(self, build):
+        real_build = build.duplicate_id if build.state == 'duplicate' else build
+
+        result = super(Controller, self).build_info(build)
+        result['disable_base_log'] = real_build.disable_base_log
+
+        return result
