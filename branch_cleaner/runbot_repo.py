@@ -71,3 +71,8 @@ class RunbotRepo(Model):
 
             branch_recs.unlink()
             _logger.info('%s branches removed', len(branch_recs))
+
+    @api.model
+    def cron_clean_branches(self):
+        all_branch = self.search([])
+        all_branch.clean_branches()

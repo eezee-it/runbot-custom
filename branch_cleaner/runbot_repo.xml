@@ -11,5 +11,16 @@
             </xpath>
         </field>
     </record>
+
+    <record model="ir.cron" id="clean_branches">
+        <field name='name'>Branch Cleaner</field>
+        <field name='interval_number'>1</field>
+        <field name='interval_type'>days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False" />
+        <field name="model">runbot.repo</field>
+        <field name="function">cron_clean_branches</field>
+        <field name="args">()</field>
+    </record>
 </data>
 </openerp>
