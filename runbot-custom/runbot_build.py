@@ -20,14 +20,15 @@
 
 import openerp.tools as tools
 import threading
-from openerp.osv import osv
+import traceback
 import os
 import time
 import openerp
 import logging
 from openerp import SUPERUSER_ID
-from openerp.osv import fields, osv
 from openerp.addons.runbot.runbot import RunbotController
+from openerp.fields import Boolean
+from openerp.models import Model, api
 
 _logger = logging.getLogger(__name__)
 
@@ -40,12 +41,16 @@ def grep(filename, string):
 def now():
     return time.strftime(openerp.tools.DEFAULT_SERVER_DATETIME_FORMAT)
 
-class RunbotBuild(osv.osv):
+class RunbotRepo(Model):
+    _inherit = 'runbot.repo'
+
+    install_chart_account = Boolean('Install the chart account', default=True,
+                                    help="Install the chart account according the country of the company")
+
+class RunbotBuild(Model):
     _inherit = "runbot.build"
 
-    _columns = {
-        'disable_base_log': fields.boolean('Disable Base Log'),
-    }
+    disable_base_log = Boolean('Disable Base Log')
 
     def job_10_test_base(self, cr, uid, build, lock_path, log_path):
         disable_job = self.pool.get('ir.config_parameter').get_param(cr, uid, 'runbot.disable_job_10', default='True')
@@ -80,6 +85,11 @@ class RunbotBuild(osv.osv):
         return self.spawn(cmd, lock_path, log_path, cpu_limit=2100)
 
     def job_25_install_chart_account(self, cr, uid, build, lock_path, log_path):
+        # Check if this job must be ignored
+        if not build.repo_id.install_chart_account:
+            _logger.debug("Ignore chart account installation")
+            return
+
         build._log('test_chart_account', 'Start install chart account')
 
         db = openerp.sql_db.db_connect('%s-all' % build.dest)
@@ -89,11 +99,12 @@ class RunbotBuild(osv.osv):
         try:
             build_cr.execute("SELECT id FROM ir_module_module WHERE state = 'installed' AND name = 'account'")
             if build_cr.fetchone():
-                print 'Start importing'
+                _logger.debug("Start importing")
                 tools.convert_file(build_cr, 'runbot-custom', 'account_post_install.yml', {})
                 build_cr.commit()
-                print 'End importing'
+                _logger.debug("End importing")
         except:
+            _logger.error("Error during chart account installation:\n %s" % traceback.format_exc())
             build.write({'result': 'ko', 'state': 'done'})
             pass
 
