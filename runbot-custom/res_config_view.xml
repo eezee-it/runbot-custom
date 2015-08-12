@@ -7,7 +7,7 @@
             <field name="model">runbot.config.settings</field>
             <field name="inherit_id" ref="runbot.view_runbot_configuration"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[field[@name='default_branch_max_days']]" position="after">
+                <xpath expr="//group[label[@string='Settings']]/div" position="inside">
                     <div>
                         <field name="default_disable_job_10" class="oe_inline" />
                         <label for="default_disable_job_10" />
