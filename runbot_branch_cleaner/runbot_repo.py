@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 ##############################################################################
 #
-#    OpenERP, Open Source Business Applications
-#    Copyright (C) 2004-2012 OpenERP S.A. (<http://openerp.com>).
+#    Odoo, Open Source Management Solution
+#    Copyright (C) 2010-2015 Eezee-It (<http://www.eezee-it.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -32,6 +32,9 @@ class RunbotRepo(Model):
 
     @api.multi
     def clean_branches(self):
+        """
+        This method will delete old branches or tags
+        """
         branch = self.env['runbot.branch']
         build = self.env['runbot.build']
 
@@ -74,5 +77,8 @@ class RunbotRepo(Model):
 
     @api.model
     def cron_clean_branches(self):
+        """
+        Method called by the Cron
+        """
         all_branch = self.search([])
         all_branch.clean_branches()

@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 ##############################################################################
 #
-#    OpenERP, Open Source Business Applications
-#    Copyright (C) 2004-2012 OpenERP S.A. (<http://openerp.com>).
+#    Odoo, Open Source Management Solution
+#    Copyright (C) 2010-2015 Eezee-It (<http://www.eezee-it.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,15 +18,13 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+from openerp import models, api, fields
 
-from openerp.fields import Boolean
-from openerp.models import TransientModel, api
-from openerp.exceptions import Warning
 
-class RunbotConfigSettings(TransientModel):
+class RunbotConfigSettings(models.TransientModel):
     _inherit = 'runbot.config.settings'
 
-    default_disable_job_10 = Boolean('Disable the creation of the database \'base\'')
+    default_disable_job_10 = fields.Boolean('Disable the creation of the database \'base\'')
 
     @api.model
     def get_default_parameters(self, fields):
